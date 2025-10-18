@@ -1,0 +1,48 @@
+# Node
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Build
+dist
+build
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+.env.production
+.env.*.local
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Docs
+docs
+*.md
+!README.md
+
+# Tests
+coverage
+*.test.ts
+*.spec.ts
+
+# Logs
+logs
+*.log
+
+# Misc
+tmp
+temp
+.cache

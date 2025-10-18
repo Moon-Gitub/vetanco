@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  vetanco-reclamos:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vetanco-reclamos-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - KAPSO_API_KEY=${KAPSO_API_KEY}
+      - KAPSO_WEBHOOK_SECRET=${KAPSO_WEBHOOK_SECRET}
+      - KAPSO_PHONE_NUMBER=${KAPSO_PHONE_NUMBER}
+      - BASE_URL=${BASE_URL}
+      - FUNCTION_SECRET=${FUNCTION_SECRET}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - vetanco-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  vetanco-network:
+    driver: bridge

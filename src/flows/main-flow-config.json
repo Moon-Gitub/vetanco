@@ -1,0 +1,211 @@
+{
+  "flow": {
+    "id": "main-reclamos-vetanco",
+    "name": "Main - Reclamos Vetanco",
+    "description": "Flow orquestador principal del sistema de reclamos",
+    "version": "1.0.0",
+    "trigger": {
+      "type": "message",
+      "condition": "any_message"
+    },
+    "nodes": [
+      {
+        "id": "start",
+        "type": "StartNode",
+        "next": "bienvenida"
+      },
+      {
+        "id": "bienvenida",
+        "type": "SendTextNode",
+        "config": {
+          "message": "Buenos días. Le damos la bienvenida al asistente de Vetanco para la gestión de reclamos, quejas y comentarios.\n\nA continuación, se solicitarán algunos datos necesarios para registrar su caso y asignar un número de identificación."
+        },
+        "next": "pregunta_tipo_usuario"
+      },
+      {
+        "id": "pregunta_tipo_usuario",
+        "type": "SendTextNode",
+        "config": {
+          "message": "Antes de continuar, necesito saber si usted es el cliente que realiza el reclamo o un colaborador de Vetanco que lo está registrando en nombre del cliente.",
+          "buttons": [
+            {
+              "text": "Soy el cliente",
+              "id": "cliente"
+            },
+            {
+              "text": "Soy colaborador de Vetanco",
+              "id": "colaborador"
+            }
+          ]
+        },
+        "next": "espera_tipo_usuario"
+      },
+      {
+        "id": "espera_tipo_usuario",
+        "type": "WaitForResponseNode",
+        "config": {
+          "timeout": 300
+        },
+        "next": "decide_tipo_usuario"
+      },
+      {
+        "id": "decide_tipo_usuario",
+        "type": "DecideNode",
+        "config": {
+          "condition": "response.button_id === 'colaborador' || response.text.toLowerCase().includes('colaborador')",
+          "ifTrue": "agent_identificacion_colaborador",
+          "ifFalse": "agent_identificacion_cliente"
+        }
+      },
+      {
+        "id": "agent_identificacion_cliente",
+        "type": "AgentNode",
+        "config": {
+          "agent": "identificacion-cliente",
+          "maxTurns": 10,
+          "timeout": 600
+        },
+        "next": "function_validar_cliente"
+      },
+      {
+        "id": "agent_identificacion_colaborador",
+        "type": "AgentNode",
+        "config": {
+          "agent": "identificacion-colaborador",
+          "maxTurns": 15,
+          "timeout": 900
+        },
+        "next": "function_validar_cliente"
+      },
+      {
+        "id": "function_validar_cliente",
+        "type": "FunctionNode",
+        "config": {
+          "function": "validarCliente",
+          "url": "{{BASE_URL}}/functions/validar-cliente",
+          "method": "POST",
+          "timeout": 30
+        },
+        "next": "agent_producto"
+      },
+      {
+        "id": "agent_producto",
+        "type": "AgentNode",
+        "config": {
+          "agent": "producto",
+          "maxTurns": 12,
+          "timeout": 600,
+          "acceptsMedia": true
+        },
+        "next": "agent_descripcion"
+      },
+      {
+        "id": "agent_descripcion",
+        "type": "AgentNode",
+        "config": {
+          "agent": "descripcion",
+          "maxTurns": 8,
+          "timeout": 600
+        },
+        "next": "function_clasificar"
+      },
+      {
+        "id": "function_clasificar",
+        "type": "FunctionNode",
+        "config": {
+          "function": "clasificarCaso",
+          "url": "{{BASE_URL}}/functions/clasificar-caso",
+          "method": "POST",
+          "timeout": 15
+        },
+        "next": "function_guardar_caso"
+      },
+      {
+        "id": "function_guardar_caso",
+        "type": "FunctionNode",
+        "config": {
+          "function": "guardarCaso",
+          "url": "{{BASE_URL}}/functions/guardar-caso",
+          "method": "POST",
+          "timeout": 30
+        },
+        "next": "agent_cierre"
+      },
+      {
+        "id": "agent_cierre",
+        "type": "AgentNode",
+        "config": {
+          "agent": "cierre",
+          "maxTurns": 2,
+          "timeout": 60
+        },
+        "next": "end"
+      },
+      {
+        "id": "end",
+        "type": "EndNode"
+      }
+    ]
+  },
+  "agents": [
+    {
+      "id": "identificacion-cliente",
+      "name": "Agente de Identificación Cliente",
+      "model": "gpt-4",
+      "temperature": 0.3,
+      "systemPrompt": "Eres un asistente de Vetanco especializado en recopilar información de clientes...",
+      "tools": [
+        {
+          "name": "validar_cuit",
+          "description": "Valida el formato del CUIT argentino"
+        },
+        {
+          "name": "buscar_cliente",
+          "description": "Busca si el cliente ya existe en la base de datos"
+        }
+      ],
+      "exitConditions": [
+        {
+          "type": "all_data_collected",
+          "requiredFields": [
+            "nombre_apellido",
+            "direccion",
+            "telefono",
+            "razon_social",
+            "cuit",
+            "numero_remito"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "identificacion-colaborador",
+      "name": "Agente de Identificación Colaborador",
+      "model": "gpt-4",
+      "temperature": 0.3,
+      "systemPrompt": "Eres un asistente de Vetanco que ayuda a colaboradores internos..."
+    },
+    {
+      "id": "producto",
+      "name": "Agente de Productos",
+      "model": "gpt-4",
+      "temperature": 0.3,
+      "systemPrompt": "Eres un especialista en productos veterinarios de Vetanco...",
+      "acceptsMedia": true
+    },
+    {
+      "id": "descripcion",
+      "name": "Agente de Descripción del Incidente",
+      "model": "gpt-4",
+      "temperature": 0.3,
+      "systemPrompt": "Eres un investigador de calidad de Vetanco especializado en incidentes..."
+    },
+    {
+      "id": "cierre",
+      "name": "Agente de Cierre",
+      "model": "gpt-4",
+      "temperature": 0.3,
+      "systemPrompt": "Eres el agente final que confirma el registro exitoso del caso..."
+    }
+  ]
+}

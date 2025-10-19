@@ -258,7 +258,7 @@ class ClasificacionService {
     }
 
     // Si el envase está roto, es reclamo mayor
-    if (estadoProducto === EstadoProducto.ENVASE_ROTO) {
+    if (estadoProducto && estadoProducto === EstadoProducto.ENVASE_ROTO) {
       return {
         tipoCaso: TipoCaso.RECLAMO,
         criticidad: CriticidadReclamo.MAYOR,

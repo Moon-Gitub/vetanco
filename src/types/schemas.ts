@@ -126,7 +126,7 @@ export const productoAfectadoCompleteSchema = productoAfectadoCreateSchema.exten
 // SCHEMAS DE CASOS
 // ============================================================================
 
-export const casoCreateSchema = z.object({
+const casoBaseSchema = z.object({
   cliente_id: z.string().uuid(),
   colaborador_registro_id: z.string().uuid().optional(),
   tipo_usuario_registro: z.nativeEnum(TipoUsuarioRegistro),
@@ -139,7 +139,9 @@ export const casoCreateSchema = z.object({
   descripcion_cuando_ocurrio: z.coerce.date().optional(),
   descripcion_libre: z.string().optional(),
   numero_remito: z.string().min(1, 'Número de remito requerido')
-}).refine(
+});
+
+export const casoCreateSchema = casoBaseSchema.refine(
   (data) => {
     // Validar que si es reclamo, debe tener criticidad != NO_APLICA
     if (data.tipo_caso === TipoCaso.RECLAMO) {
@@ -154,7 +156,7 @@ export const casoCreateSchema = z.object({
   }
 );
 
-export const casoUpdateSchema = casoCreateSchema.partial().extend({
+export const casoUpdateSchema = casoBaseSchema.partial().extend({
   estado: z.nativeEnum(EstadoCaso).optional(),
   colaborador_asignado_id: z.string().uuid().optional(),
   fecha_inicio_investigacion: z.date().optional(),
@@ -164,7 +166,7 @@ export const casoUpdateSchema = casoCreateSchema.partial().extend({
   acciones_preventivas: z.string().optional()
 });
 
-export const casoSchema = casoCreateSchema.extend({
+export const casoSchema = casoBaseSchema.extend({
   id: z.string().uuid(),
   numero_caso: z.string(),
   estado: z.nativeEnum(EstadoCaso),

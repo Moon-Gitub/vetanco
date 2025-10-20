@@ -27,6 +27,11 @@ export interface ValidarClienteOutput {
 export async function validarCliente(input: ValidarClienteInput): Promise<ValidarClienteOutput> {
   const { sessionState } = input;
 
+  console.log('='.repeat(70));
+  console.log('📝 VALIDAR CLIENTE - INICIO');
+  console.log('='.repeat(70));
+  console.log('SessionState recibido:', JSON.stringify(sessionState, null, 2));
+
   try {
     // ========================================================================
     // 1. VALIDAR DATOS REQUERIDOS
@@ -39,6 +44,8 @@ export async function validarCliente(input: ValidarClienteInput): Promise<Valida
       telefono: sessionState.clienteTelefono,
       email: sessionState.clienteEmail
     };
+
+    console.log('📋 Datos del cliente a validar:', datosCliente);
 
     const validacion = validacionService.validarDatosCliente(datosCliente);
 

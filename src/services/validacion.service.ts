@@ -58,14 +58,14 @@ class ValidacionService {
    * Valida formato de teléfono argentino
    */
   validarTelefono(telefono: string): { valido: boolean; mensaje?: string; normalizado?: string } {
-    // Remover espacios, guiones y paréntesis
-    const telefonoLimpio = telefono.replace(/[\s\-()]/g, '');
+    // Remover espacios, guiones, paréntesis, y el signo +
+    const telefonoLimpio = telefono.replace(/[\s\-()+]/g, '');
 
     // Debe tener entre 10 y 13 dígitos (con o sin código de país)
-    if (telefonoLimpio.length < 10 || telefonoLimpio.length > 13) {
+    if (telefonoLimpio.length < 10 || telefonoLimpio.length > 15) {
       return {
         valido: false,
-        mensaje: 'El teléfono debe tener entre 10 y 13 dígitos'
+        mensaje: 'El teléfono debe tener entre 10 y 15 dígitos'
       };
     }
 
@@ -327,7 +327,9 @@ class ValidacionService {
       }
     }
 
-    if (datos.email) {
+    // Email es opcional, pero si viene debe ser válido
+    // Ignorar si es una variable sin resolver de Kapso
+    if (datos.email && !datos.email.startsWith('{{') && datos.email.trim() !== '') {
       const resultadoEmail = this.validarEmail(datos.email);
       if (!resultadoEmail.valido) {
         errores.push(resultadoEmail.mensaje || 'Email inválido');

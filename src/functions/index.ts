@@ -6,3 +6,5 @@
 export * from './validar-cliente';
 export * from './guardar-caso';
 export * from './clasificar-caso';
+export * from './guardar-interaccion';
+export * from './guardar-mensaje';

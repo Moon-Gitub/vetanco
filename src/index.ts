@@ -18,7 +18,9 @@ import { clasificacionService } from './services/clasificacion.service';
 import {
   validarClienteHandler,
   guardarCasoHandler,
-  clasificarCasoHandler
+  clasificarCasoHandler,
+  guardarInteraccionHandler,
+  guardarMensajeHandler
 } from './functions';
 
 // ============================================================================
@@ -194,6 +196,8 @@ async function procesarMediaRecibido(data: any) {
 app.post('/functions/validar-cliente', validarClienteHandler);
 app.post('/functions/guardar-caso', guardarCasoHandler);
 app.post('/functions/clasificar-caso', clasificarCasoHandler);
+app.post('/functions/guardar-interaccion', guardarInteraccionHandler);
+app.post('/functions/guardar-mensaje', guardarMensajeHandler);
 
 // ============================================================================
 // API ENDPOINTS - CASOS

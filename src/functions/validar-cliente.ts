@@ -105,7 +105,7 @@ export async function validarCliente(input: ValidarClienteInput): Promise<Valida
       localidad: partesDir[partesDir.length - 2] || 'No especificado',
       provincia: partesDir[partesDir.length - 1] || 'No especificado',
       telefono: telefonoNormalizado,
-      email: sessionState.clienteEmail,
+      email: sessionState.clienteEmail && sessionState.clienteEmail.trim() !== '' ? sessionState.clienteEmail : undefined,
       whatsapp_number: sessionState.clienteTelefono, // Asumimos que el tel es WhatsApp
       activo: true
     };

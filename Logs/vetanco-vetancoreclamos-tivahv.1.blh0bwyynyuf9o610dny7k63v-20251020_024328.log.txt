@@ -1,0 +1,99 @@
+2025-10-20T02:14:34.888Z nombre_apellido: undefined,
+2025-10-20T02:14:34.888Z razon_social: undefined,
+2025-10-20T02:14:34.888Z cuit: undefined,
+2025-10-20T02:14:34.888Z telefono: undefined,
+2025-10-20T02:14:34.888Z email: undefined
+2025-10-20T02:14:34.888Z }
+2025-10-20T02:14:47.605Z [2025-10-20T02:14:47.605Z] GET /health
+2025-10-20T02:15:17.719Z [2025-10-20T02:15:17.719Z] GET /health
+2025-10-20T02:15:47.841Z [2025-10-20T02:15:47.841Z] GET /health
+2025-10-20T02:16:17.968Z [2025-10-20T02:16:17.968Z] GET /health
+2025-10-20T02:16:48.099Z [2025-10-20T02:16:48.097Z] GET /health
+2025-10-20T02:17:18.229Z [2025-10-20T02:17:18.227Z] GET /health
+2025-10-20T02:17:48.335Z [2025-10-20T02:17:48.334Z] GET /health
+2025-10-20T02:18:18.454Z [2025-10-20T02:18:18.452Z] GET /health
+2025-10-20T02:18:48.567Z [2025-10-20T02:18:48.566Z] GET /health
+2025-10-20T02:19:18.684Z [2025-10-20T02:19:18.684Z] GET /health
+2025-10-20T02:19:48.819Z [2025-10-20T02:19:48.818Z] GET /health
+2025-10-20T02:20:18.951Z [2025-10-20T02:20:18.950Z] GET /health
+2025-10-20T02:20:49.075Z [2025-10-20T02:20:49.074Z] GET /health
+2025-10-20T02:21:19.181Z [2025-10-20T02:21:19.180Z] GET /health
+2025-10-20T02:21:49.282Z [2025-10-20T02:21:49.282Z] GET /health
+2025-10-20T02:22:19.407Z [2025-10-20T02:22:19.407Z] GET /health
+2025-10-20T02:22:49.542Z [2025-10-20T02:22:49.541Z] GET /health
+2025-10-20T02:23:19.693Z [2025-10-20T02:23:19.692Z] GET /health
+2025-10-20T02:23:49.806Z [2025-10-20T02:23:49.804Z] GET /health
+2025-10-20T02:24:19.926Z [2025-10-20T02:24:19.925Z] GET /health
+2025-10-20T02:24:50.045Z [2025-10-20T02:24:50.044Z] GET /health
+2025-10-20T02:25:20.174Z [2025-10-20T02:25:20.173Z] GET /health
+2025-10-20T02:25:50.283Z [2025-10-20T02:25:50.283Z] GET /health
+2025-10-20T02:26:20.379Z [2025-10-20T02:26:20.379Z] GET /health
+2025-10-20T02:26:50.498Z [2025-10-20T02:26:50.498Z] GET /health
+2025-10-20T02:27:20.622Z [2025-10-20T02:27:20.622Z] GET /health
+2025-10-20T02:27:50.744Z [2025-10-20T02:27:50.744Z] GET /health
+2025-10-20T02:28:20.870Z [2025-10-20T02:28:20.870Z] GET /health
+2025-10-20T02:28:50.988Z [2025-10-20T02:28:50.988Z] GET /health
+2025-10-20T02:29:21.105Z [2025-10-20T02:29:21.104Z] GET /health
+2025-10-20T02:29:51.216Z [2025-10-20T02:29:51.215Z] GET /health
+2025-10-20T02:30:21.357Z [2025-10-20T02:30:21.355Z] GET /health
+2025-10-20T02:30:51.485Z [2025-10-20T02:30:51.485Z] GET /health
+2025-10-20T02:31:21.613Z [2025-10-20T02:31:21.612Z] GET /health
+2025-10-20T02:31:51.729Z [2025-10-20T02:31:51.729Z] GET /health
+2025-10-20T02:32:21.846Z [2025-10-20T02:32:21.845Z] GET /health
+2025-10-20T02:32:51.971Z [2025-10-20T02:32:51.971Z] GET /health
+2025-10-20T02:33:22.098Z [2025-10-20T02:33:22.098Z] GET /health
+2025-10-20T02:33:52.204Z [2025-10-20T02:33:52.203Z] GET /health
+2025-10-20T02:34:22.331Z [2025-10-20T02:34:22.331Z] GET /health
+2025-10-20T02:34:52.458Z [2025-10-20T02:34:52.458Z] GET /health
+2025-10-20T02:35:08.694Z [2025-10-20T02:35:08.694Z] POST /functions/validar-cliente
+2025-10-20T02:35:08.694Z ======================================================================
+2025-10-20T02:35:08.694Z 📝 VALIDAR CLIENTE - INICIO
+2025-10-20T02:35:08.694Z ======================================================================
+2025-10-20T02:35:08.694Z SessionState recibido: "{{sessionState}}"
+2025-10-20T02:35:08.694Z 📋 Datos del cliente a validar: {
+2025-10-20T02:35:08.694Z nombre_apellido: undefined,
+2025-10-20T02:35:08.694Z razon_social: undefined,
+2025-10-20T02:35:08.694Z cuit: undefined,
+2025-10-20T02:35:08.694Z telefono: undefined,
+2025-10-20T02:35:08.694Z email: undefined
+2025-10-20T02:35:08.694Z }
+2025-10-20T02:35:22.585Z [2025-10-20T02:35:22.584Z] GET /health
+2025-10-20T02:35:52.721Z [2025-10-20T02:35:52.720Z] GET /health
+2025-10-20T02:36:22.841Z [2025-10-20T02:36:22.840Z] GET /health
+2025-10-20T02:36:52.962Z [2025-10-20T02:36:52.962Z] GET /health
+2025-10-20T02:37:23.106Z [2025-10-20T02:37:23.105Z] GET /health
+2025-10-20T02:37:53.238Z [2025-10-20T02:37:53.238Z] GET /health
+2025-10-20T02:38:23.367Z [2025-10-20T02:38:23.366Z] GET /health
+2025-10-20T02:38:33.429Z [2025-10-20T02:38:33.428Z] POST /functions/clasificar-caso
+2025-10-20T02:38:33.435Z Error en clasificarCaso: TypeError: Cannot create property 'tipoCaso' on string '{{sessionState}}'
+2025-10-20T02:38:33.435Z at clasificarCaso (/app/dist/functions/clasificar-caso.js:11:31)
+2025-10-20T02:38:33.435Z at clasificarCasoHandler (/app/dist/functions/clasificar-caso.js:46:33)
+2025-10-20T02:38:33.435Z at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+2025-10-20T02:38:33.435Z at next (/app/node_modules/express/lib/router/route.js:149:13)
+2025-10-20T02:38:33.435Z at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+2025-10-20T02:38:33.435Z at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+2025-10-20T02:38:33.435Z at /app/node_modules/express/lib/router/index.js:284:15
+2025-10-20T02:38:33.435Z at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+2025-10-20T02:38:33.435Z at next (/app/node_modules/express/lib/router/index.js:280:10)
+2025-10-20T02:38:33.435Z at /app/dist/index.js:33:5
+2025-10-20T02:38:33.436Z Error en clasificarCasoHandler: TypeError: Cannot create property 'tipoCaso' on string '{{sessionState}}'
+2025-10-20T02:38:33.436Z at clasificarCaso (/app/dist/functions/clasificar-caso.js:28:31)
+2025-10-20T02:38:33.436Z at clasificarCasoHandler (/app/dist/functions/clasificar-caso.js:46:33)
+2025-10-20T02:38:33.436Z at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+2025-10-20T02:38:33.436Z at next (/app/node_modules/express/lib/router/route.js:149:13)
+2025-10-20T02:38:33.436Z at Route.dispatch (/app/node_modules/express/lib/router/route.js:119:3)
+2025-10-20T02:38:33.436Z at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+2025-10-20T02:38:33.436Z at /app/node_modules/express/lib/router/index.js:284:15
+2025-10-20T02:38:33.436Z at Function.process_params (/app/node_modules/express/lib/router/index.js:346:12)
+2025-10-20T02:38:33.436Z at next (/app/node_modules/express/lib/router/index.js:280:10)
+2025-10-20T02:38:33.436Z at /app/dist/index.js:33:5
+2025-10-20T02:38:34.069Z [2025-10-20T02:38:34.069Z] POST /functions/guardar-caso
+2025-10-20T02:38:53.491Z [2025-10-20T02:38:53.490Z] GET /health
+2025-10-20T02:39:23.637Z [2025-10-20T02:39:23.636Z] GET /health
+2025-10-20T02:39:53.755Z [2025-10-20T02:39:53.754Z] GET /health
+2025-10-20T02:40:23.866Z [2025-10-20T02:40:23.866Z] GET /health
+2025-10-20T02:40:53.974Z [2025-10-20T02:40:53.973Z] GET /health
+2025-10-20T02:41:24.064Z [2025-10-20T02:41:24.064Z] GET /health
+2025-10-20T02:41:54.196Z [2025-10-20T02:41:54.196Z] GET /health
+2025-10-20T02:42:24.322Z [2025-10-20T02:42:24.322Z] GET /health
+2025-10-20T02:42:54.473Z [2025-10-20T02:42:54.471Z] GET /health

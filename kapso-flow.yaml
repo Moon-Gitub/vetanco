@@ -1,0 +1,353 @@
+name: Vetanco-Reclamos
+description: Sistema de gestión de reclamos, quejas y comentarios de Vetanco
+version: 1.0.0
+
+# Trigger: Mensaje entrante de WhatsApp
+trigger:
+  type: whatsapp_message
+  events:
+    - message.received
+
+# Variables globales del flujo
+variables:
+  # Cliente
+  clienteNombreApellido: ""
+  clienteRazonSocial: ""
+  clienteCUIT: ""
+  clienteDireccionCalle: ""
+  clienteDireccionNumero: ""
+  clienteDireccionPiso: ""
+  clienteCodigoPostal: ""
+  clienteLocalidad: ""
+  clienteProvincia: ""
+  clienteTelefono: ""
+  clienteEmail: ""
+  clienteId: ""
+
+  # Producto
+  productoNombre: ""
+  productoPresentacion: ""
+  productoLote: ""
+  productoVencimiento: ""
+  productoEstado: ""
+  productoCantidadAfectada: 0
+  productoUnidadMedida: ""
+
+  # Caso
+  numeroRemito: ""
+  descripcionQueSucedio: ""
+  descripcionDondeOcurrio: ""
+  descripcionCuandoOcurrio: ""
+  descripcionLibre: ""
+
+  # Clasificación
+  tipoCaso: ""
+  criticidad: ""
+  justificacion: ""
+
+  # Resultado
+  numeroCaso: ""
+  casoId: ""
+
+# Nodos del flujo
+nodes:
+  # ========================================================================
+  # NODO 1: BIENVENIDA
+  # ========================================================================
+  - id: bienvenida
+    type: send_message
+    config:
+      message: |
+        Buenos días. Le damos la bienvenida al asistente de Vetanco para la gestión de reclamos, quejas y comentarios.
+
+        A continuación, se solicitarán algunos datos necesarios para registrar su caso y asignar un número de identificación.
+    next: agente_identificacion
+
+  # ========================================================================
+  # NODO 2: AGENTE IDENTIFICACIÓN CLIENTE
+  # ========================================================================
+  - id: agente_identificacion
+    type: agent
+    config:
+      name: Agente Identificación Cliente
+      model: gpt-4o
+      temperature: 0.3
+      max_iterations: 10
+      timeout: 600
+
+      system_prompt: |
+        Eres un asistente de Vetanco especializado en recopilar información de clientes.
+
+        Tu objetivo es capturar los siguientes datos de forma amigable:
+        1. Nombre y Apellido completo
+        2. Razón Social de la empresa
+        3. CUIT (debe tener formato XX-XXXXXXXX-X con 11 dígitos)
+        4. Dirección completa (calle, número, localidad, provincia, código postal)
+        5. Teléfono de contacto
+        6. Email (opcional)
+        7. Número de remito del pedido
+
+        INSTRUCCIONES IMPORTANTES:
+        - Haz preguntas UNA POR VEZ, no pidas todo junto
+        - El CUIT debe tener 11 dígitos (formato XX-XXXXXXXX-X)
+        - Si el cliente no tiene algún dato, pídelo específicamente
+        - Sé cordial y profesional
+        - Al final, resume TODOS los datos y pide confirmación
+
+        Cuando el cliente confirme que los datos son correctos, di EXACTAMENTE: "Datos confirmados, continuamos"
+
+      # Variables que este agente captura
+      output_variables:
+        - clienteNombreApellido
+        - clienteRazonSocial
+        - clienteCUIT
+        - clienteDireccionCalle
+        - clienteDireccionNumero
+        - clienteCodigoPostal
+        - clienteLocalidad
+        - clienteProvincia
+        - clienteTelefono
+        - clienteEmail
+        - numeroRemito
+
+      # Condición de salida
+      exit_condition:
+        type: message_contains
+        value: "Datos confirmados, continuamos"
+
+    next: function_validar_cliente
+
+  # ========================================================================
+  # NODO 3: FUNCTION - VALIDAR CLIENTE
+  # ========================================================================
+  - id: function_validar_cliente
+    type: http_request
+    config:
+      method: POST
+      url: https://vetanco.aiporvos.com/functions/validar-cliente
+      headers:
+        Content-Type: application/json
+      body:
+        sessionState:
+          clienteNombreApellido: "{{ clienteNombreApellido }}"
+          clienteRazonSocial: "{{ clienteRazonSocial }}"
+          clienteCUIT: "{{ clienteCUIT }}"
+          clienteDireccion: "{{ clienteDireccionCalle }}, {{ clienteLocalidad }}, {{ clienteProvincia }}"
+          clienteTelefono: "{{ clienteTelefono }}"
+          clienteEmail: "{{ clienteEmail }}"
+          numeroRemito: "{{ numeroRemito }}"
+      timeout: 30
+
+      # Guardar respuesta en variables
+      response_mapping:
+        clienteId: "{{ response.clienteId }}"
+
+    next: agente_producto
+
+  # ========================================================================
+  # NODO 4: AGENTE PRODUCTO
+  # ========================================================================
+  - id: agente_producto
+    type: agent
+    config:
+      name: Agente Producto
+      model: gpt-4o
+      temperature: 0.3
+      max_iterations: 10
+      timeout: 600
+      accepts_media: true
+
+      system_prompt: |
+        Eres un especialista en productos veterinarios de Vetanco.
+
+        Debes capturar la siguiente información sobre el producto afectado:
+        1. Nombre y presentación del producto (ej: "Antiparasitario Vetanco 500ml")
+        2. Número de lote (impreso en el envase)
+        3. Fecha de vencimiento
+        4. Estado del producto: "usado" o "sin_usar"
+        5. Estado del envase: "envase_roto" o "envase_sano"
+        6. Cantidad afectada (número y unidad: kg, litros, frascos, etc.)
+
+        INSTRUCCIONES IMPORTANTES:
+        - Pregunta de forma clara y ordenada, UNA PREGUNTA A LA VEZ
+        - Si el cliente envía fotos del producto, acéptalas
+        - El estado del producto debe ser exactamente "usado" o "sin_usar"
+        - El estado del envase debe ser exactamente "envase_roto" o "envase_sano"
+        - La cantidad debe incluir número Y unidad (ej: "10 frascos", "5 litros")
+
+        Al finalizar, resume toda la información y di EXACTAMENTE: "Información del producto registrada"
+
+      output_variables:
+        - productoNombre
+        - productoPresentacion
+        - productoLote
+        - productoVencimiento
+        - productoEstado
+        - productoCantidadAfectada
+        - productoUnidadMedida
+
+      exit_condition:
+        type: message_contains
+        value: "Información del producto registrada"
+
+    next: agente_descripcion
+
+  # ========================================================================
+  # NODO 5: AGENTE DESCRIPCIÓN
+  # ========================================================================
+  - id: agente_descripcion
+    type: agent
+    config:
+      name: Agente Descripción
+      model: gpt-4o
+      temperature: 0.3
+      max_iterations: 8
+      timeout: 600
+
+      system_prompt: |
+        Eres un investigador de calidad de Vetanco especializado en registrar incidentes.
+
+        Debes obtener la siguiente información:
+        1. ¿QUÉ SUCEDIÓ? - Descripción detallada del problema (OBLIGATORIO, mínimo 20 caracteres)
+        2. ¿DÓNDE OCURRIÓ? - Ubicación del incidente (campo, galpón, corral, etc.)
+        3. ¿CUÁNDO OCURRIÓ? - Fecha y hora aproximada
+
+        INSTRUCCIONES CRÍTICAS:
+        - La descripción de "qué sucedió" debe tener AL MENOS 20 caracteres
+        - Haz preguntas abiertas para obtener todos los detalles
+        - Si mencionan síntomas graves, muertes de animales, o intoxicación, regístralos EXACTAMENTE como el cliente los describe
+        - Sé empático si reportan problemas graves
+        - NO minimices la situación
+
+        Al finalizar, resume la información capturada y di EXACTAMENTE: "Descripción del incidente registrada"
+
+      output_variables:
+        - descripcionQueSucedio
+        - descripcionDondeOcurrio
+        - descripcionCuandoOcurrio
+        - descripcionLibre
+
+      exit_condition:
+        type: message_contains
+        value: "Descripción del incidente registrada"
+
+    next: function_clasificar_caso
+
+  # ========================================================================
+  # NODO 6: FUNCTION - CLASIFICAR CASO
+  # ========================================================================
+  - id: function_clasificar_caso
+    type: http_request
+    config:
+      method: POST
+      url: https://vetanco.aiporvos.com/functions/clasificar-caso
+      headers:
+        Content-Type: application/json
+      body:
+        sessionState:
+          clienteId: "{{ clienteId }}"
+          clienteNombre: "{{ clienteNombreApellido }}"
+          productoNombre: "{{ productoNombre }}"
+          productoLote: "{{ productoLote }}"
+          productoEstado: "{{ productoEstado }}"
+          descripcionQueSucedio: "{{ descripcionQueSucedio }}"
+          descripcionDondeOcurrio: "{{ descripcionDondeOcurrio }}"
+          descripcionCuandoOcurrio: "{{ descripcionCuandoOcurrio }}"
+      timeout: 15
+
+      response_mapping:
+        tipoCaso: "{{ response.sessionState.tipoCaso }}"
+        criticidad: "{{ response.sessionState.criticidad }}"
+        justificacion: "{{ response.sessionState.justificacion }}"
+
+    next: function_guardar_caso
+
+  # ========================================================================
+  # NODO 7: FUNCTION - GUARDAR CASO
+  # ========================================================================
+  - id: function_guardar_caso
+    type: http_request
+    config:
+      method: POST
+      url: https://vetanco.aiporvos.com/functions/guardar-caso
+      headers:
+        Content-Type: application/json
+      body:
+        sessionState:
+          clienteId: "{{ clienteId }}"
+          clienteNombre: "{{ clienteNombreApellido }}"
+          clienteRazonSocial: "{{ clienteRazonSocial }}"
+          clienteCUIT: "{{ clienteCUIT }}"
+          clienteDireccion: "{{ clienteDireccionCalle }}, {{ clienteLocalidad }}, {{ clienteProvincia }}"
+          clienteTelefono: "{{ clienteTelefono }}"
+          clienteEmail: "{{ clienteEmail }}"
+          numeroRemito: "{{ numeroRemito }}"
+          productoNombre: "{{ productoNombre }}"
+          productoPresentacion: "{{ productoPresentacion }}"
+          productoLote: "{{ productoLote }}"
+          productoVencimiento: "{{ productoVencimiento }}"
+          productoEstado: "{{ productoEstado }}"
+          productoCantidadAfectada: "{{ productoCantidadAfectada }}"
+          productoUnidadMedida: "{{ productoUnidadMedida }}"
+          descripcionQueSucedio: "{{ descripcionQueSucedio }}"
+          descripcionDondeOcurrio: "{{ descripcionDondeOcurrio }}"
+          descripcionCuandoOcurrio: "{{ descripcionCuandoOcurrio }}"
+          tipoCaso: "{{ tipoCaso }}"
+          criticidad: "{{ criticidad }}"
+          justificacion: "{{ justificacion }}"
+      timeout: 30
+
+      response_mapping:
+        numeroCaso: "{{ response.numeroCaso }}"
+        casoId: "{{ response.casoId }}"
+
+    next: agente_cierre
+
+  # ========================================================================
+  # NODO 8: AGENTE CIERRE
+  # ========================================================================
+  - id: agente_cierre
+    type: agent
+    config:
+      name: Agente Cierre
+      model: gpt-4o
+      temperature: 0.3
+      max_iterations: 2
+      timeout: 60
+
+      system_prompt: |
+        Eres el agente final que confirma el registro exitoso del caso en Vetanco.
+
+        INFORMACIÓN DISPONIBLE:
+        - Número de caso: {{ numeroCaso }}
+        - Tipo de caso: {{ tipoCaso }}
+        - Criticidad: {{ criticidad }}
+
+        TU TAREA:
+        1. Informa al cliente que su caso fue registrado exitosamente
+        2. Proporciona el NÚMERO DE CASO claramente
+        3. Explica los próximos pasos según la criticidad:
+           - Si es CRÍTICO: "Nuestro equipo se contactará en las próximas 4 horas debido a la urgencia del caso"
+           - Si es MAYOR: "Nuestro equipo se contactará en las próximas 24 horas"
+           - Si es MENOR: "Procesaremos su caso en las próximas 48 horas"
+           - Si es QUEJA: "Hemos registrado su reporte y será evaluado"
+           - Si es COMENTARIO: "Agradecemos su consulta/comentario"
+        4. Agradece por contactarse con Vetanco
+        5. Despídete cordialmente
+
+        TONO: Empático, profesional y tranquilizador.
+
+        Finaliza con: "Que tenga un buen día"
+
+      context_variables:
+        - numeroCaso
+        - tipoCaso
+        - criticidad
+
+    next: end
+
+  # ========================================================================
+  # NODO FINAL
+  # ========================================================================
+  - id: end
+    type: end

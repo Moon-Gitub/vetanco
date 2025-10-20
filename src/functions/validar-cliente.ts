@@ -159,23 +159,43 @@ export async function validarClienteHandler(req: any, res: any) {
     console.log('='.repeat(70));
     console.log('Headers:', JSON.stringify(req.headers, null, 2));
     console.log('Body RAW:', JSON.stringify(req.body, null, 2));
+    console.log('Query params:', JSON.stringify(req.query, null, 2));
     console.log('Body type:', typeof req.body);
     console.log('Body keys:', Object.keys(req.body || {}));
 
-    const input: ValidarClienteInput = req.body;
+    let sessionState: SessionState;
 
-    // Validar que venga el sessionState
-    if (!input.sessionState) {
-      console.error('❌ ERROR: sessionState no encontrado en el body');
-      console.error('Body recibido:', input);
+    // OPCIÓN 1: Body tiene sessionState como objeto
+    if (req.body.sessionState && typeof req.body.sessionState === 'object') {
+      console.log('✅ Formato 1: Body contiene sessionState como objeto');
+      sessionState = req.body.sessionState;
+    }
+    // OPCIÓN 2: El body ES el sessionState directamente
+    else if (req.body && Object.keys(req.body).length > 0) {
+      console.log('✅ Formato 2: Body ES el sessionState');
+      sessionState = req.body;
+    }
+    // OPCIÓN 3: Los datos vienen en query params
+    else if (req.query && Object.keys(req.query).length > 0) {
+      console.log('✅ Formato 3: Datos en query params');
+      sessionState = req.query as SessionState;
+    }
+    // ERROR: No hay datos
+    else {
+      console.error('❌ ERROR: No se encontraron datos en el request');
       return res.status(400).json({
-        error: 'sessionState requerido',
-        bodyRecibido: input
+        error: 'No se encontraron datos. Envía sessionState en el body o como query params',
+        bodyRecibido: req.body,
+        queryRecibido: req.query
       });
     }
 
-    console.log('✅ sessionState encontrado, llamando a validarCliente...');
+    console.log('📦 SessionState procesado:', JSON.stringify(sessionState, null, 2));
+    console.log('✅ Llamando a validarCliente...');
+
+    const input: ValidarClienteInput = { sessionState };
     const resultado = await validarCliente(input);
+
     console.log('✅ Resultado de validarCliente:', JSON.stringify(resultado, null, 2));
 
     return res.status(resultado.success ? 200 : 400).json(resultado);

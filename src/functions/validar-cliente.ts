@@ -154,16 +154,29 @@ export async function validarCliente(input: ValidarClienteInput): Promise<Valida
  */
 export async function validarClienteHandler(req: any, res: any) {
   try {
+    console.log('='.repeat(70));
+    console.log('🔍 VALIDAR CLIENTE HANDLER - REQUEST COMPLETO');
+    console.log('='.repeat(70));
+    console.log('Headers:', JSON.stringify(req.headers, null, 2));
+    console.log('Body RAW:', JSON.stringify(req.body, null, 2));
+    console.log('Body type:', typeof req.body);
+    console.log('Body keys:', Object.keys(req.body || {}));
+
     const input: ValidarClienteInput = req.body;
 
     // Validar que venga el sessionState
     if (!input.sessionState) {
+      console.error('❌ ERROR: sessionState no encontrado en el body');
+      console.error('Body recibido:', input);
       return res.status(400).json({
-        error: 'sessionState requerido'
+        error: 'sessionState requerido',
+        bodyRecibido: input
       });
     }
 
+    console.log('✅ sessionState encontrado, llamando a validarCliente...');
     const resultado = await validarCliente(input);
+    console.log('✅ Resultado de validarCliente:', JSON.stringify(resultado, null, 2));
 
     return res.status(resultado.success ? 200 : 400).json(resultado);
 

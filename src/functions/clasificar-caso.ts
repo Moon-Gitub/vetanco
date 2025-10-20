@@ -81,15 +81,31 @@ export async function clasificarCaso(input: ClasificarCasoInput): Promise<Clasif
  */
 export async function clasificarCasoHandler(req: any, res: any) {
   try {
-    const input: ClasificarCasoInput = req.body;
+    console.log('='.repeat(70));
+    console.log('🔍 CLASIFICAR CASO HANDLER');
+    console.log('='.repeat(70));
+    console.log('Body RAW:', JSON.stringify(req.body, null, 2));
 
-    if (!input.sessionState) {
+    let sessionState: SessionState;
+
+    // Aceptar múltiples formatos (igual que validar-cliente)
+    if (req.body.sessionState && typeof req.body.sessionState === 'object') {
+      sessionState = req.body.sessionState;
+    } else if (req.body && Object.keys(req.body).length > 0) {
+      sessionState = req.body;
+    } else {
+      console.error('❌ ERROR: No se encontraron datos');
       return res.status(400).json({
         error: 'sessionState requerido'
       });
     }
 
+    console.log('📦 SessionState procesado:', JSON.stringify(sessionState, null, 2));
+
+    const input: ClasificarCasoInput = { sessionState };
     const resultado = await clasificarCaso(input);
+
+    console.log('✅ Resultado:', JSON.stringify(resultado, null, 2));
 
     return res.status(resultado.success ? 200 : 400).json(resultado);
 
